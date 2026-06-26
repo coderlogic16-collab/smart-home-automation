@@ -14,8 +14,10 @@ AdafruitIO_Feed *bulb = io.feed("bulb");
 
 //Pins & Relay
 
-const int motorpin = 26;
-const int bulbpin  = 27;
+const int object1 = 26;
+const int object2 = 27;
+const int object3 = 25;
+const int object4 = 32;
 #define RELAY_ON_LOW
 #define RELAY_OFF HIGH
 
@@ -50,15 +52,18 @@ const char HTML [] PROGMEM = R"rawliteral(
 <h2>ESP32 Relay Control</h2>
 <p id="status">Status: Ready</p>
 <hr>
-<h3>Motor</h3>
-<button oneclick="sendCmd('/motor/on')">Motor ON</button>
-<button oneclick="sendCmd('/motor/off')">Motor OFF</button>
-<h3>Bulb</h3>
-<button oneclick="sendCmd('/bulb/on')">Bulb ON</button>
-<button oneclick="sendCmd('/bulb/off')">Bulb OFF</button>
-<h3>Object3</h3>
+<h3>Object 1</h3>
+<button oneclick="sendCmd('/object1/on')">Object1 ON</button>
+<button oneclick="sendCmd('/object1/off')">Object1 OFF</button>
+<h3>Object 2</h3>
+<button oneclick="sendCmd('/object2/on')">Object2 ON</button>
+<button oneclick="sendCmd('/object2/off')">Object2 OFF</button>
+<h3>Object 3</h3>
 <button oneclick="sendCmd('/object3/on')">Object3 ON</button>
 <button oneclick="sendCmd('/object3/off')">Object3 OFF</button>
+<h3>Object 4</h3>
+<button oneclick="sendCmd('/object4/on')">Object4 ON</button>
+<button oneclick="sendCmd('/object4/off')">Object4 OFF</button>
 <hr>
 <h3>System Mode</h3>
 <button oneclick="sendCmd('/switchMode')" style="background-color:#dc3545; ">Switch to %MODE%</button>
@@ -69,5 +74,34 @@ String processor(const String& var)  {
   return (mode == "AP") ? "Station" : "AP";
 }
 
+
+//  Web Handlers
+
+void handleRoot()  {
+  String page = HTML ; 
+  page.replace("%MODE%" , processor(""));
+  server.send(200, "text/html", page);
+}
+
+void handleSwitchMode()  {
+  mode = (mode == "AP") ? "SM" : "AP";
+  preferences.putString("mode", mode);
+  Serial.println("Switch requested: mode changed to " + mode);
+  server.send(200, "text/plain", "Switching mode to " + mode);
+  delay(1000);
+  ESP.restart();
+}
+
+void handleObject1On()  { digitalWrite(Object1Pin, Relay_ON);  Serial.println("Object 1 ON");  server.send(200, "text/plain", "Object 1 ON"); }
+void handleObject1On()  { digitalWrite(Object1Pin, Relay_OFF);  Serial.println("Object 1 OFF");  server.send(200, "text/plain", "Object 1 OFF"); }
+
+void handleObject2On()  { digitalWrite(Object2Pin, Relay_ON);  Serial.println("Object 2 ON");  server.send(200, "text/plain", "Object 2 ON"); }
+void handleObject2On()  { digitalWrite(Object2Pin, Relay_OFF);  Serial.println("Object 2 OFF");  server.send(200, "text/plain", "Object 2 OFF"); }
+
+void handleObject3On()  { digitalWrite(Object3Pin, Relay_ON);  Serial.println("Object 3 ON");  server.send(200, "text/plain", "Object 3 ON"); }
+void handleObject3On()  { digitalWrite(Object3Pin, Relay_OFF);  Serial.println("Object 3 OFF");  server.send(200, "text/plain", "Object 3 OFF"); }
+
+void handleObject4On()  { digitalWrite(Object4Pin, Relay_ON);  Serial.println("Object 4 ON");  server.send(200, "text/plain", "Object 4 ON"); }
+void handleObject4On()  { digitalWrite(Object4Pin, Relay_OFF);  Serial.println("Object 4 OFF");  server.send(200, "text/plain", "Object 4 OFF"); }
 
 
