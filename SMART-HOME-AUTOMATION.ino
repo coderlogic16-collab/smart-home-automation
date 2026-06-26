@@ -17,16 +17,16 @@ AdafruitIO_Feed *object4Feed = io.feed("object4");
 
 //Pins & Relay
 
-const int object1 = 26;
-const int object2 = 27;
-const int object3 = 25;
-const int object4 = 32;
-#define RELAY_ON_LOW
+const int object1Pin = 26;
+const int object2Pin = 27;
+const int object3Pin = 25;
+const int object4Pin = 32;
+#define RELAY_ON LOW
 #define RELAY_OFF HIGH
 
 //Web server & modes
 
-Webserver server(80) ;
+WebServer server(80) ;
 Preferences preferences;
 String mode = "AP";
 
@@ -34,20 +34,20 @@ String mode = "AP";
 
 const char HTML [] PROGMEM = R"rawliteral(
 <!DOCTYPE   html><html><head><title>ESP32  Control</title>
-<meta name = "viewport" content="width=device-width, intial-scale=1">
+<meta name = "viewport" content="width=device-width, initial-scale=1">
 <style>
-  body{text-align:centre;font-family:sans-serif;background-color:#f4f4f9;}
+  body{text-align:center;font-family:sans-serif;background-color:#f4f4f9;}
   button{padding:14px;margin:8px;font-size:18px;border-radius:8px;border:none;background-color:#007bff;color:white;cursor:pointer;}
-  button;active{background-color:#0056b3;}
+  button:active{background-color:#0056b3;}
   #status{margin-top:20px;font-weight:bold;color:#333;}
 </style>
 <script>
-  function sendDmd (url)  {
-    document.getElementById('status').innerText = 'Sending command...';}
+  function sendCmd (url)  {
+    document.getElementById('status').innerText = 'Sending command...';
     fetch(url)
       .then(response => response.text())
-      .then(text =>  {  document.getElementById( 'status').innerText = 'status: ' + text; })
-      .catch(err =>  {  document.getElemntById('status').innerText = 'Error connecting to ESP32'; });
+      .then(text =>  {  document.getElementById( 'status').innerText = 'Status: ' + text; })
+      .catch(err =>  {  document.getElementById('status').innerText = 'Error connecting to ESP32'; });
 
   }
 </script>
@@ -56,20 +56,20 @@ const char HTML [] PROGMEM = R"rawliteral(
 <p id="status">Status: Ready</p>
 <hr>
 <h3>Object 1</h3>
-<button oneclick="sendCmd('/object1/on')">Object1 ON</button>
-<button oneclick="sendCmd('/object1/off')">Object1 OFF</button>
+<button onclick="sendCmd('/object1/on')">Object1 ON</button>
+<button onclick="sendCmd('/object1/off')">Object1 OFF</button>
 <h3>Object 2</h3>
-<button oneclick="sendCmd('/object2/on')">Object2 ON</button>
-<button oneclick="sendCmd('/object2/off')">Object2 OFF</button>
+<button onclick="sendCmd('/object2/on')">Object2 ON</button>
+<button onclick="sendCmd('/object2/off')">Object2 OFF</button>
 <h3>Object 3</h3>
-<button oneclick="sendCmd('/object3/on')">Object3 ON</button>
-<button oneclick="sendCmd('/object3/off')">Object3 OFF</button>
+<button onclick="sendCmd('/object3/on')">Object3 ON</button>
+<button onclick="sendCmd('/object3/off')">Object3 OFF</button>
 <h3>Object 4</h3>
-<button oneclick="sendCmd('/object4/on')">Object4 ON</button>
-<button oneclick="sendCmd('/object4/off')">Object4 OFF</button>
+<button onclick="sendCmd('/object4/on')">Object4 ON</button>
+<button onclick="sendCmd('/object4/off')">Object4 OFF</button>
 <hr>
 <h3>System Mode</h3>
-<button oneclick="sendCmd('/switchMode')" style="background-color:#dc3545; ">Switch to %MODE%</button>
+<button onclick="sendCmd('/switchMode')" style="background-color:#dc3545; ">Switch to %MODE%</button>
 </body></html>
 )rawliteral";
 
@@ -96,16 +96,16 @@ void handleSwitchMode()  {
 }
 
 void handleObject1On()  { digitalWrite(Object1Pin, Relay_ON);  Serial.println("Object 1 ON");  server.send(200, "text/plain", "Object 1 ON"); }
-void handleObject1On()  { digitalWrite(Object1Pin, Relay_OFF);  Serial.println("Object 1 OFF");  server.send(200, "text/plain", "Object 1 OFF"); }
+void handleObject1Off()  { digitalWrite(Object1Pin, Relay_OFF);  Serial.println("Object 1 OFF");  server.send(200, "text/plain", "Object 1 OFF"); }
 
 void handleObject2On()  { digitalWrite(Object2Pin, Relay_ON);  Serial.println("Object 2 ON");  server.send(200, "text/plain", "Object 2 ON"); }
-void handleObject2On()  { digitalWrite(Object2Pin, Relay_OFF);  Serial.println("Object 2 OFF");  server.send(200, "text/plain", "Object 2 OFF"); }
+void handleObject2Off()  { digitalWrite(Object2Pin, Relay_OFF);  Serial.println("Object 2 OFF");  server.send(200, "text/plain", "Object 2 OFF"); }
 
 void handleObject3On()  { digitalWrite(Object3Pin, Relay_ON);  Serial.println("Object 3 ON");  server.send(200, "text/plain", "Object 3 ON"); }
-void handleObject3On()  { digitalWrite(Object3Pin, Relay_OFF);  Serial.println("Object 3 OFF");  server.send(200, "text/plain", "Object 3 OFF"); }
+void handleObject3Off()  { digitalWrite(Object3Pin, Relay_OFF);  Serial.println("Object 3 OFF");  server.send(200, "text/plain", "Object 3 OFF"); }
 
 void handleObject4On()  { digitalWrite(Object4Pin, Relay_ON);  Serial.println("Object 4 ON");  server.send(200, "text/plain", "Object 4 ON"); }
-void handleObject4On()  { digitalWrite(Object4Pin, Relay_OFF);  Serial.println("Object 4 OFF");  server.send(200, "text/plain", "Object 4 OFF"); }
+void handleObject4Off()  { digitalWrite(Object4Pin, Relay_OFF);  Serial.println("Object 4 OFF");  server.send(200, "text/plain", "Object 4 OFF"); }
 
 // Web Routes
 
@@ -133,10 +133,10 @@ void setup()  {
 
   //Initialize Pins
 
-  pinmode(object1Pin, OUTPUT);
-  pinmode(object2Pin, OUTPUT);
-  pinmode(object3Pin, OUTPUT);
-  pinmode(object4Pin, OUTPUT);
+  pinMode(object1Pin, OUTPUT);
+  pinMode(object2Pin, OUTPUT);
+  pinMode(object3Pin, OUTPUT);
+  pinMode(object4Pin, OUTPUT);
 
   digitalWrite(object1Pin, RELAY_OFF);
   digitalWrite(object2Pin, RELAY_OFF);
@@ -149,7 +149,7 @@ void setup()  {
   if (mode == "AP") {
     WiFi.softAP("ESP32-CONTROL", "12345678");
     Serial.println("Mode: Access Point (AP)");
-    Serial.print("AP IP: "); Serial.println(WiFi,softAPIP());
+    Serial.print("AP IP: "); Serial.println(WiFi.softAPIP());
   } else {
     WiFi.begin(WIFI_SSID, WIFI_PASS);
     Serial.println("Mode: Station (SM)");
@@ -170,7 +170,7 @@ void setup()  {
       Serial.print("connecting to ADAFRUIT IO");
 
       unsigned long aio_start = millis();
-      while(io.status() < AIO_CONNECTED && millis()- aio _start <10000) {
+      while(io.status() < AIO_CONNECTED && millis() - aio _start <10000) {
         delay(500);
         Serial.print(".");
       }
@@ -220,7 +220,7 @@ void setup()  {
 
 // Loop
 
-void Loop() {
+void loop() {
   server.handleClient();
   if (mode == "SM" && WiFi.status() == WL_CONNECTED) {
     io.run(); // only run io when connected to wifi
